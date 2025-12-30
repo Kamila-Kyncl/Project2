@@ -5,15 +5,15 @@ author: Kamila Kynčl
 email: kamilka.frolikova@gmail.com
 """
 
-import sys
 import random
 
 SEPARATOR_LENGTH = 50
 NUMBER_LENGTH = 4
 
-def create_secret_number():
-    """Vygeneruje náhodné čtyřmístné číslo bez opakování číslic.
 
+def create_secret_number() -> str:
+    """
+    Vygeneruje náhodné čtyřmístné číslo bez opakování číslic.
     Číslo nezačíná nulou a je vráceno jako řetězec.
     """
     first = random.choice(range(1, 10))
@@ -23,9 +23,10 @@ def create_secret_number():
     )
     return str(first) + "".join(map(str, rest))
 
-def validate_tip(tip):
-    """Ověří vstup uživatele
 
+def validate_tip(tip: str) -> str:
+    """
+    Ověří vstup uživatele.
     Vrací vstupní řetězec pokud je vše v pořádku, jinak chybovou hlášku
     """
 
@@ -43,7 +44,8 @@ def validate_tip(tip):
     
     return tip
 
-def resolve(secret, tip):
+
+def resolve(secret: str, tip: str) -> tuple[int, int]:
     """
     Vrací počet bulls a cows
     
@@ -61,7 +63,8 @@ def resolve(secret, tip):
 
     return bulls, cows
 
-def print_results(bulls, cows):
+
+def print_results(bulls: int, cows: int) -> None:
     """
     Vypíše počet bulls a cows
     
@@ -78,25 +81,54 @@ def print_results(bulls, cows):
         cows_text += "s"
 
     print(str(bulls) + " " + bulls_text + ", " + str(cows) + " " + cows_text)
-    
+    separator()
 
-SECRET_NUMBER = create_secret_number()
 
-print("Hi there")
-print("-" * SEPARATOR_LENGTH)
-print("I've generated a random 4 digit number for you.")
-print("Let's play a bulls and cows game.")
-print("-" * SEPARATOR_LENGTH)
+def separator() -> None:
+    """
+    Vypíše oddělovač textu
+    """
+    print("-" * SEPARATOR_LENGTH)  
 
-while True:
-    tip = input("Enter a number :\n" + "-" * SEPARATOR_LENGTH + "\n")
-    validated_tip = validate_tip(tip)
 
-    if validated_tip == tip: # Pokud je tip validní
-        break
-    else:
-        print(validated_tip + "\n" + "-" * SEPARATOR_LENGTH + "\n")
+def main() -> None:
+    """Spustí konzolovou hru Bulls & Cows."""
 
-bulls_cows = resolve(SECRET_NUMBER, validated_tip)
-print_results(bulls_cows[0], bulls_cows[1])
-print(SECRET_NUMBER)
+    secret_number = create_secret_number()
+
+    print("Hi there!")
+    separator()
+    print("I've generated a random 4 digit number for you.")
+    print("Let's play a bulls and cows game.")
+    separator()
+    print("Enter a number:")
+    separator()
+
+    tips_number = 0
+
+    while True:
+        while True:
+            tip = input()
+            validated_tip = validate_tip(tip)
+
+            if validated_tip == tip: # Pokud je tip validní
+                tips_number += 1
+                break
+            else:
+                print(validated_tip)
+                separator()
+
+        bulls_cows = resolve(secret_number, validated_tip)
+
+        if bulls_cows[0] == NUMBER_LENGTH: # Uživatel uhodl číslo
+            print("Correct, you've guessed the right number")
+            print("in " + str(tips_number) + " guesses!")
+            separator()
+            print("That's amazing!")
+            return
+        
+        print_results(bulls_cows[0], bulls_cows[1])
+
+
+if __name__ == "__main__":
+    main()
