@@ -24,25 +24,25 @@ def create_secret_number() -> str:
     return str(first) + "".join(map(str, rest))
 
 
-def validate_tip(tip: str) -> str:
+def validate_tip(tip: str) -> tuple[bool, str]:
     """
     Ověří vstup uživatele.
-    Vrací vstupní řetězec pokud je vše v pořádku, jinak chybovou hlášku
+    Vrací zda je vstup v pořádku, pokud ne, tak i chybovou hlášku
     """
 
     if len(tip) != NUMBER_LENGTH:
-        return "Input has not length of 4"
+        return False, "Input has not length of 4"
 
     if not tip.isdigit():
-        return "Input is not digits only"
+        return False, "Input is not digits only"
     
     if tip[0] == "0":
-        return "First digit cannot be 0"
+        return False, "First digit cannot be 0"
     
     if len(set(tip)) != NUMBER_LENGTH:
-        return "Duplicit numbers are not allowed"
+        return False, "Duplicit numbers are not allowed"
     
-    return tip
+    return True, ""
 
 
 def resolve(secret: str, tip: str) -> tuple[int, int]:
@@ -107,27 +107,25 @@ def main() -> None:
     tips_number = 0
 
     while True:
-        while True:
-            tip = input()
-            validated_tip = validate_tip(tip)
+        tip = input()
+        is_valid, message = validate_tip(tip)
 
-            if validated_tip == tip: # Pokud je tip validní
-                tips_number += 1
-                break
-            else:
-                print(validated_tip)
-                separator()
+        if not is_valid:
+            print(message)
+            separator()
+            continue
 
-        bulls_cows = resolve(secret_number, validated_tip)
+        tips_number += 1
+        bulls, cows = resolve(secret_number, tip)
 
-        if bulls_cows[0] == NUMBER_LENGTH: # Uživatel uhodl číslo
+        if bulls == NUMBER_LENGTH:  # Uživatel uhodl číslo
             print("Correct, you've guessed the right number")
             print("in " + str(tips_number) + " guesses!")
             separator()
             print("That's amazing!")
             return
-        
-        print_results(bulls_cows[0], bulls_cows[1])
+    
+        print_results(bulls, cows)
 
 
 if __name__ == "__main__":
